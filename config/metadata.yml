@@ -1,8 +1,8 @@
 ---
 metadata:
   - name: description
-    content: The PERC Prototype is served by TaxonPages.
+    content: Search PERC, powered by TaxonWorks.
   - name: keywords
-    content: purdue, entomology, perc, taxonpages
+    content: purdue, entomology, perc, taxonworks, taxonpages
   - name: robots
     content: follow
