@@ -15,6 +15,8 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import PanelDropdown from '../PanelDropdown.vue'
 
 const isLoading = ref(false)
 </script>
