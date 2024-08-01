@@ -7,7 +7,7 @@
         legend=""
       />
     </ClientOnly>
-    <VCardHeader>
+    <VCardHeader class="flex justify-between">
       <h2 class="text-md">Collection Objects</h2>
       <PanelDropdown panel-key="panel:collection-objects" />
     </VCardHeader>
