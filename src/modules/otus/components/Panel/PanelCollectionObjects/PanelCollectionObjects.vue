@@ -6,11 +6,14 @@
         logo-class="w-8 h-8"
         legend=""
       />
-      <VCardHeader>
-        <h2 class="text-md">Collection Objects</h2>
-        <PanelDropdown panel-key="panel:collection-objects" />
-      </VCardHeader>
     </ClientOnly>
+    <VCardHeader>
+      <h2 class="text-md">Collection Objects</h2>
+      <PanelDropdown panel-key="panel:collection-objects" />
+    </VCardHeader>
+    <VCardContent class="text-sm">
+      <p>Placeholder.</p>
+    </VCardContent>
   </VCard>
 </template>
 
