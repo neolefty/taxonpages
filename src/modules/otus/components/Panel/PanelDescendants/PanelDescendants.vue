@@ -22,6 +22,13 @@
             "
             :taxonomy="taxonomy"
           />
+          <p v-if="
+            taxonomy &&
+            !taxonomy.nomenclatural_synonyms.length &&
+            !taxonomy.descendants.length
+          ">
+            No descendants.
+          </p>
         </AnimationOpacity>
       </ul>
     </VCardContent>
