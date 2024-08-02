@@ -2,7 +2,7 @@
   <VCard>
     <ClientOnly>
       <VSpinner
-          v-if="isLoading"
+          v-if="isLoading.collectionObjects || isLoading.inventory"
           logo-class="w-8 h-8"
           legend=""
       />
@@ -12,7 +12,10 @@
       <PanelDropdown panel-key="panel:collection-objects" />
     </VCardHeader>
     <VCardContent class="text-sm">
-      <p v-html="content"/>
+      <h3>Collection Objects</h3>
+      <p v-html="collectionObjects"/>
+      <h3>Inventory</h3>
+      <p v-html="inventory"/>
     </VCardContent>
   </VCard>
 </template>
@@ -32,26 +35,51 @@ const props = defineProps({
   }
 })
 
-const content = ref("Loading...")
-const isLoading = ref(false)
+const collectionObjects = ref("Loading...")
+const inventory = ref("Loading...")
+const isLoading = ref({collectionObjects: false, inventory: false})
 
 watch(
     () => props.otuId,
     async () => {
       if (!props.otuId) {
-        content.value = 'No OTU specified.'
+        collectionObjects.value = 'No OTU specified.'
+        inventory.value = 'No OTU specified.'
         return
       }
 
-      isLoading.value = true
+      isLoading.value = {...isLoading.value, collectionObjects: true}
       useOtuPageRequest('panel:collection-objects', () =>
         TaxonWorks.getCollectionObjects(props.otuId)
       ).then(({data}) => {
-        content.value = `Collection objects for ${props.otuId}: ${JSON.stringify(data)}`
+        collectionObjects.value = `Collection objects for ${props.otuId}: ${JSON.stringify(data)}`
+        console.log({data})
       }).catch(
-          e => content.value = `Error: ${JSON.stringify(e)}`
-      ).finally(() => isLoading.value = false)
+          e => collectionObjects.value = `Error: ${e}`
+      ).finally(() => isLoading.value = {...isLoading.value, collectionObjects: false})
     },
     {immediate: true}
-)
+  )
+
+watch(
+    () => props.otuId,
+    async () => {
+      if (!props.otuId) {
+        inventory.value = 'No OTU specified.'
+        return
+      }
+
+      isLoading.value = {...isLoading.value, inventory: true}
+      useOtuPageRequest('panel:inventory', () =>
+        TaxonWorks.getInventory(props.otuId)
+      ).then(({data}) => {
+        inventory.value = `Inventory for ${props.otuId}: ${JSON.stringify(data)}`
+        console.log({data})
+      }).catch(
+          e => inventory.value = `Error: ${e}`
+      ).finally(() => isLoading.value = {...isLoading.value, inventory: false})
+    },
+    {immediate: true}
+  )
+
 </script>
