@@ -59,6 +59,12 @@ export default class TaxonWorks {
     return makeAPIRequest.get(`/otus/${otuId}/inventory/content`, opt)
   }
 
+  // Note that this could support multiple OTUs.
+  // The API takes a comma-separated list of OTU IDs.
+  static getCollectionObjects(otuId, opt) {
+    return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}`, opt)
+  }
+
   static getCachedMap(id) {
     return makeAPIRequest.get(`/cached_maps/${id}`)
   }

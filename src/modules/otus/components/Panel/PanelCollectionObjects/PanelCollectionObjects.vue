@@ -20,6 +20,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import PanelDropdown from '../PanelDropdown.vue'
+import { useOtuPageRequest } from "@/modules/otus/helpers/useOtuPageRequest.js"
+import TaxonWorks from "@/modules/otus/services/TaxonWorks.js"
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -42,9 +44,13 @@ watch(
       }
 
       isLoading.value = true
-      await sleep(2000)
-      content.value = `Collection objects content for ${props.otuId}.`
-      isLoading.value = false
+      useOtuPageRequest('panel:collection-objects', () =>
+        TaxonWorks.getCollectionObjects(props.otuId)
+      ).then(({data}) => {
+        content.value = `Collection objects for ${props.otuId}: ${JSON.stringify(data)}`
+      }).catch(
+          e => content.value = `Error: ${JSON.stringify(e)}`
+      ).finally(() => isLoading.value = false)
     },
     {immediate: true}
 )
