@@ -68,9 +68,10 @@ export default class TaxonWorks {
         @with_buffered_determinations = boolean_param(params, :with_buffered_determinations)
         @with_buffered_other_labels = boolean_param(params, :with_buffered_other_labels)
      */
-    return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}&with_buffered_determination=true`, opt)
+    // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}&with_buffered_determination=true`, opt)
     // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}&descendants=true`, opt)
-    // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}`, opt)
+    return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}`, opt)
+    // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}/dwc.json`, opt)
   }
 
   static getInventory(otuId, opt) {
