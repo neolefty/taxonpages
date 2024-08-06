@@ -62,7 +62,9 @@ export default class TaxonWorks {
   // Note that this could support multiple OTUs.
   // The API takes a comma-separated list of OTU IDs.
   static getCollectionObjects(otuId, opt) {
-    // See taxonworks/lib/collection_object/filter.rb Queries:CollectionObject:Filter for full list of options
+    return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}`, opt)
+    // See taxonworks/lib/collection_object/filter.rb Queries:CollectionObject:Filter for full list of options.
+    // However, none seems to change the result.
     /*
         @with_buffered_collecting_event = boolean_param(params, :with_buffered_collecting_event)
         @with_buffered_determinations = boolean_param(params, :with_buffered_determinations)
@@ -70,11 +72,10 @@ export default class TaxonWorks {
      */
     // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}&with_buffered_determination=true`, opt)
     // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}&descendants=true`, opt)
-    return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}`, opt)
     // return makeAPIRequest.get(`/collection_objects?otu_id[]=${otuId}/dwc.json`, opt)
   }
 
-  static getInventory(otuId, opt) {
+  static getInventoryDarwinCore(otuId, opt) {
     return makeAPIRequest.get(`/otus/${otuId}/inventory/dwc.json`, opt)
   }
 

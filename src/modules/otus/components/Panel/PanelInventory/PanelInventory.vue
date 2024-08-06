@@ -8,10 +8,35 @@
       />
     </ClientOnly>
     <VCardHeader class="flex justify-between">
-      <h2 class="text-md">Collection Objects</h2>
+      <h2 class="text-md">
+        Inventory
+        <span v-if="Array.isArray(inventory)"> [{{inventory.length}}]</span>
+      </h2>
       <PanelDropdown panel-key="panel:inventory" />
     </VCardHeader>
     <VCardContent class="text-sm">
+      <details class="pb-4">
+        <summary class="cursor-pointer">
+          Collection Objects
+          <span v-if="Array.isArray(collectionObjects)"> [{{collectionObjects.length}}]</span>
+        </summary>
+        <p v-if="typeof collectionObjects === 'string'" v-html="collectionObjects"/>
+        <ul v-else  class="tree ml-2">
+          <li v-for="collectionObject in collectionObjects" :key="collectionObject?.id">
+            <details>
+              <summary class="cursor-pointer">
+                {{ collectionObject.id }} — length {{JSON.stringify(collectionObject).length}}
+              </summary>
+              <ul class="m-2 ml-6 list-disc">
+                <li v-for="entry in Object.entries(collectionObject)" :key="entry[0]">
+                  <em>{{ entry[0] }}:</em> {{ entry[1] }}
+                </li>
+              </ul>
+              <p v-html="JSON.stringify(collectionObject, null, 1)"/>
+            </details>
+          </li>
+        </ul>
+      </details>
       <h3>Inventory</h3>
       <p v-if="typeof inventory === 'string'" v-html="inventory"/>
       <ul v-else class="tree ml-2">
@@ -21,12 +46,12 @@
               {{ makeInventoryLabel(inventoryItem) }}
             </summary>
             <ul class="m-2 ml-6 list-disc">
-              <li v-for="detail in makeInventoryDetails(inventoryItem)" v-html="detail" :key="detail.id"/>
+              <li v-for="detail in makeInventoryDetails(inventoryItem)" v-html="detail" :key="detail?.id"/>
               <li>
                 <details>
-                  <summary class="cursor-pointer">Full Record</summary>
+                  <summary class="cursor-pointer">Full Record ({{Object.keys(inventoryItem).length}} items)</summary>
                   <dl class="m-2 ml-6">
-                    <template v-for="entry in Object.entries(inventoryItem)">
+                    <template v-for="entry in Object.entries(inventoryItem)" :key="entry[0]">
                       <dt>{{ entry[0] }}</dt>
                       <dd class="ml-4 mb-2">{{ entry[1] }}</dd>
                     </template>
@@ -34,23 +59,6 @@
                 </details>
               </li>
             </ul>
-          </details>
-        </li>
-      </ul>
-      <h3 class="pt-2">Collection Objects</h3>
-      <p v-if="typeof collectionObjects === 'string'" v-html="collectionObjects"/>
-      <ul v-else  class="tree ml-2">
-        <li v-for="collectionObject in collectionObjects" :key="collectionObject.id">
-          <details>
-            <summary>
-              {{ collectionObject.id }} — length {{JSON.stringify(collectionObject).length}}
-            </summary>
-            <ul class="m-2 ml-6 list-disc">
-              <li v-for="entry in Object.entries(collectionObject)" :key="entry.id">
-                <em>{{ entry[0] }}:</em> {{ entry[1] }}
-              </li>
-            </ul>
-            <p v-html="JSON.stringify(collectionObject, null, 1)"/>
           </details>
         </li>
       </ul>
@@ -89,11 +97,11 @@ function makeInventoryDetails(item) {
   return [
     makeInventoryCollectionDate(item),
     item.recordedBy && `Recorded by ${item.recordedBy}`,
-    item.identifiedBy && `Identified by ${item.identifiedBy}, ${item.dateIdentified}`,
+    makeIdentifiedByDesccription(item),
     item.georeferencedBy && `Georeferenced by ${item.georeferencedBy}${makeGeoreferenceUncertainty(item)}`,
     // CollectionObject #1234
     item.dwc_occurrence_object_id && `${item.dwc_occurrence_object_type} #${item.dwc_occurrence_object_id}`,
-  ]
+  ].filter(Boolean)
 }
 
 function makeLocationDescription(item) {
@@ -101,6 +109,13 @@ function makeLocationDescription(item) {
     item.country && item.country,
     item.stateProvince && item.stateProvince,
     item.county && `${item.county} County`,
+  ].filter(Boolean).join(", ")
+}
+
+function makeIdentifiedByDesccription(item) {
+  return [
+    item.identifiedBy && `Identified by ${item.identifiedBy}`,
+    item.dateIdentified,
   ].filter(Boolean).join(", ")
 }
 
@@ -128,7 +143,7 @@ watch(
         TaxonWorks.getCollectionObjects(props.otuId)
       ).then(({data}) => {
         collectionObjects.value = data
-        console.log(data)
+        console.log('CollectionObjects', data)
       }).catch(
           e => collectionObjects.value = `Error: ${e}`
       ).finally(() => isLoading.value = {...isLoading.value, collectionObjects: false})
@@ -146,10 +161,10 @@ watch(
 
       isLoading.value = {...isLoading.value, inventory: true}
       useOtuPageRequest('panel:inventory', () =>
-        TaxonWorks.getInventory(props.otuId)
+        TaxonWorks.getInventoryDarwinCore(props.otuId)
       ).then(({data}) => {
         inventory.value = data
-        console.log(data)
+        console.log('Inventory (Darwin Core)', data)
       }).catch(
           e => inventory.value = `Error: ${e}`
       ).finally(() => isLoading.value = {...isLoading.value, inventory: false})
